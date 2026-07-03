@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sebo Virtual | Sebo Digital</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header professional-header">
+    <a class="brand brand-pro" href="index.html" aria-label="Página inicial do Sebo Virtual">
+        <img src="logo-sebo.svg" alt="Logo Sebo Virtual" class="brand-logo-img">
+        <span class="brand-copy">
+            <strong>Sebo Virtual</strong>
+            <small>compre, venda e troque com facilidade</small>
+        </span>
+    </a>
+    <div class="header-right header-actions-pro">
+        <span class="header-pill">Comunidade de leitores</span>
+        <button id="btnPerfilUsuario" class="user-chip-btn" onclick="abrirPerfilLateral()" title="Abrir perfil">
+            <span id="headerAvatar" class="header-avatar">U</span>
+            <span id="user"></span>
+        </button>
+        <button onclick="logout()" class="sair-btn">Sair</button>
+    </div>
+</header>
+
+<nav class="app-nav">
+    <button id="btn-explorar" onclick="mudarAba('explorar', this)" class="ativo">Explorar</button>
+    <button id="btn-sacola" onclick="mudarAba('sacola', this)">Sacola <span id="badgeSacola" class="nav-badge">0</span></button>
+    <button id="btn-interesses" onclick="mudarAba('interesses', this)">Propostas</button>
+    <button id="btn-biblioteca" onclick="mudarAba('biblioteca', this)">Biblioteca</button>
+    <button id="btn-meus" onclick="mudarAba('meus', this)">Meus Anúncios</button>
+</nav>
+
+<main>
+    <section class="hero-panel" id="heroPanel">
+        <div class="hero-copy">
+            <span class="eyebrow">Sebo digital da comunidade</span>
+            <h2>Encontre, anuncie e negocie livros com uma comunidade que realmente lê.</h2>
+            <p>Descubra livros usados, organize seus anúncios e converse direto com outros leitores em uma experiência mais prática e profissional.</p>
+            <div class="hero-actions">
+                <button class="btn-primary" onclick="mudarAba('explorar', document.getElementById('btn-explorar'))">Explorar catálogo</button>
+                <button class="btn-ghost" onclick="mudarAba('meus', document.getElementById('btn-meus'))">Criar anúncio</button>
+            </div>
+            <div class="hero-proof-row">
+                <span>✓ negociação direta</span>
+                <span>✓ anúncios organizados</span>
+                <span>✓ painel administrativo</span>
+            </div>
+        </div>
+
+        <div id="destaqueLivro" class="hero-market-card">
+            <span class="market-label">Destaque do acervo</span>
+            <strong>Carregando livros...</strong>
+            <small>O destaque será atualizado automaticamente pelo catálogo.</small>
+        </div>
+    </section>
+
+    <section class="market-metrics" id="metricasSite">
+        <div class="mini-stat">
+            <strong id="statDisponiveis">0</strong>
+            <span>livros disponíveis</span>
+        </div>
+        <div class="mini-stat">
+            <strong id="statVenda">0</strong>
+            <span>aceitam venda</span>
+        </div>
+        <div class="mini-stat">
+            <strong id="statTroca">0</strong>
+            <span>aceitam troca</span>
+        </div>
+        <div class="mini-stat">
+            <strong id="statMeusLivros">0</strong>
+            <span>meus anúncios</span>
+        </div>
+    </section>
+
+    <section class="quick-categories" id="categoriasRapidas">
+        <button class="quick-chip active" onclick="filtrarGeneroRapido('Todos')">Todos</button>
+        <button class="quick-chip" onclick="filtrarGeneroRapido('Ficção')">Ficção</button>
+        <button class="quick-chip" onclick="filtrarGeneroRapido('Romance')">Romance</button>
+        <button class="quick-chip" onclick="filtrarGeneroRapido('Técnico')">Técnico</button>
+        <button class="quick-chip" onclick="filtrarGeneroRapido('Didático')">Didático</button>
+        <button class="quick-chip" onclick="filtrarGeneroRapido('Acadêmico')">Acadêmico</button>
+    </section>
+
+    <section class="filtros-area" id="filtrosArea">
+        <input
+            type="text"
+            id="busca"
+            placeholder="🔍 Buscar por título ou autor..."
+            oninput="buscarLivros()"
+            class="busca"
+        />
+        <select id="filtroGenero" onchange="sincronizarChips(); mostrarLivros();">
+            <option value="Todos">Todos os gêneros</option>
+            <option value="Ficção">Ficção</option>
+            <option value="Romance">Romance</option>
+            <option value="Terror">Terror</option>
+            <option value="Técnico">Técnico</option>
+            <option value="Didático">Didático</option>
+            <option value="Acadêmico">Acadêmico</option>
+            <option value="Outros">Outros</option>
+        </select>
+        <select id="filtroTipo" onchange="mostrarLivros()">
+            <option value="Todos">Todos os anúncios</option>
+            <option value="venda">Venda</option>
+            <option value="troca">Troca</option>
+            <option value="ambos">Venda ou troca</option>
+        </select>
+        <select id="filtroOrdenacao" onchange="mostrarLivros()">
+            <option value="recentes">Mais recentes</option>
+            <option value="titulo">Título A-Z</option>
+            <option value="autor">Autor A-Z</option>
+            <option value="menor-preco">Menor preço</option>
+            <option value="maior-preco">Maior preço</option>
+        </select>
+        <select id="filtroAvaliacao" onchange="mostrarLivros()">
+            <option value="Todos">Todas as avaliações</option>
+            <option value="4">4 estrelas ou mais</option>
+            <option value="3">3 estrelas ou mais</option>
+            <option value="avaliados">Somente avaliados</option>
+            <option value="sem">Sem avaliações</option>
+        </select>
+        <button class="btn-ghost" onclick="limparFiltros()">Limpar</button>
+    </section>
+
+    <section id="formSection" class="form-section" style="display:none;">
+        <div class="form-title-row">
+            <div>
+                <span class="eyebrow compact">Área do vendedor</span>
+                <h3 id="formTitulo">Adicionar novo anúncio</h3>
+                <p>Cadastre livros para venda, troca ou as duas opções.</p>
+            </div>
+            <button id="btnCancelarEdicao" onclick="cancelarEdicao()" class="btn-ghost" style="display:none;">Cancelar edição</button>
+        </div>
+
+        <div class="seller-tips">
+            <span>💡 Use título e autor corretos para facilitar a busca.</span>
+            <span>💰 Para venda, informe um valor claro para facilitar a negociação.</span>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="titulo" placeholder="Título do livro">
+            <input type="text" id="autor" placeholder="Autor">
+
+            <select id="generoCadastro">
+                <option value="Ficção">Ficção</option>
+                <option value="Romance">Romance</option>
+                <option value="Terror">Terror</option>
+                <option value="Técnico">Técnico</option>
+                <option value="Didático">Didático</option>
+                <option value="Acadêmico">Acadêmico</option>
+                <option value="Outros">Outros</option>
+            </select>
+
+            <select id="tipoAnuncio" onchange="togglePreco()">
+                <option value="troca">🔄 Apenas Troca</option>
+                <option value="venda">💰 Apenas Venda</option>
+                <option value="ambos">🔄💰 Troca ou Venda</option>
+            </select>
+
+            <select id="estadoLivro">
+                <option value="usado_bom">Usado em bom estado</option>
+                <option value="novo">Novo</option>
+                <option value="seminovo">Seminovo</option>
+                <option value="usado_marcado">Usado com marcas</option>
+                <option value="danificado">Com avarias</option>
+            </select>
+
+            <input
+                type="number"
+                id="precoLivro"
+                placeholder="Preço (R$)"
+                style="display:none;"
+                min="0"
+                step="0.01"
+            >
+
+            <div class="foto-anuncio-box">
+                <div class="foto-anuncio-title">
+                    <strong>Fotos do anúncio</strong>
+                    <span>opcional • até 4 imagens</span>
+                </div>
+                <label for="fotosLivro" class="foto-upload-label">Selecionar fotos do livro</label>
+                <input
+                    type="file"
+                    id="fotosLivro"
+                    accept="image/*"
+                    multiple
+                    onchange="handleFotosAnuncioChange(this)"
+                >
+                <small>Use fotos da capa, lombada ou detalhes do estado de conservação.</small>
+                <div id="previewFotosLivro" class="preview-fotos empty-preview">Nenhuma foto adicionada</div>
+            </div>
+
+            <button onclick="adicionarLivro()" class="btn-adicionar" id="btnSalvarLivro">
+                Adicionar Livro
+            </button>
+        </div>
+    </section>
+
+    <section class="section-heading" id="sectionHeading">
+        <div>
+            <span id="sectionEyebrow">Acervo disponível</span>
+            <h2 id="sectionTitle">Livros em destaque</h2>
+        </div>
+        <strong id="resultadoContador" class="resultado-contador">0 resultados</strong>
+    </section>
+
+    <section id="livros" class="grid"></section>
+
+    <section id="trustStrip" class="trust-strip compact-info-strip">
+        <div><strong>Negociação direta</strong><span>Compra, troca e conversa com o anunciante.</span></div>
+        <div><strong>Biblioteca pessoal</strong><span>Metas de leitura e progresso do usuário.</span></div>
+        <div><strong>Administração</strong><span>Gestão de anúncios, avaliações e pedidos.</span></div>
+    </section>
+
+    <section id="bibliotecaPage" class="biblioteca-page" style="display:none;">
+        <div class="biblioteca-hero">
+            <div>
+                <span class="eyebrow compact">Minha biblioteca</span>
+                <h2>Controle suas leituras sem misturar com seus anúncios.</h2>
+                <p>Defina metas, registre páginas lidas e acompanhe livros em andamento, desejados e concluídos.</p>
+            </div>
+            <div class="biblioteca-hero-actions">
+                <button class="btn-primary" onclick="abrirModalBiblioteca()">+ Adicionar livro</button>
+                <button class="btn-ghost" onclick="carregarPainelLeitura()">Atualizar</button>
+            </div>
+        </div>
+
+        <div id="bibliotecaResumoMain" class="biblioteca-main-grid">
+            <article class="reading-focus-card main-reading-card">
+                <span class="drawer-eyebrow">Lendo agora</span>
+                <h3 id="mainLivroAtualTitulo">Nenhum livro em andamento</h3>
+                <p id="mainLivroAtualAutor">Adicione um livro para começar seu acompanhamento.</p>
+                <div class="progress-line"><span id="mainLivroAtualPaginas">0 de 0 páginas</span><strong id="mainLivroAtualPercentual">0%</strong></div>
+                <div class="progress-track"><div id="mainLivroAtualBarra" class="progress-fill" style="width:0%"></div></div>
+                <button id="btnRegistrarLeituraMain" class="btn-reading" onclick="registrarLeituraLivroAtual()" disabled>Registrar leitura</button>
+            </article>
+
+            <article class="goal-card main-goal-card">
+                <div class="goal-title-row">
+                    <div><span class="drawer-eyebrow">Metas</span><h3>Ritmo de leitura</h3></div>
+                    <button class="mini-link" onclick="salvarMetasLeitura()">Salvar metas</button>
+                </div>
+                <div class="goal-input-grid">
+                    <label>Meta diária<input id="metaDiariaInputMain" type="number" min="1" placeholder="20"><small>páginas por dia</small></label>
+                    <label>Meta mensal<input id="metaMensalInputMain" type="number" min="1" placeholder="1"><small>livros por mês</small></label>
+                </div>
+                <div class="goal-progress-list">
+                    <div><div class="progress-line"><span id="mainMetaDiariaTexto">0 de 20 páginas hoje</span><strong id="mainMetaDiariaPct">0%</strong></div><div class="progress-track"><div id="mainMetaDiariaBarra" class="progress-fill small" style="width:0%"></div></div></div>
+                    <div><div class="progress-line"><span id="mainMetaMensalTexto">0 de 1 livro no mês</span><strong id="mainMetaMensalPct">0%</strong></div><div class="progress-track"><div id="mainMetaMensalBarra" class="progress-fill small" style="width:0%"></div></div></div>
+                </div>
+            </article>
+        </div>
+
+        <section class="drawer-stats-grid biblioteca-stats-main">
+            <div><strong id="mainStatQueroLer">0</strong><span>quero ler</span></div>
+            <div><strong id="mainStatLendo">0</strong><span>lendo</span></div>
+            <div><strong id="mainStatLidos">0</strong><span>lidos</span></div>
+            <div><strong id="mainStatPaginas">0</strong><span>páginas hoje</span></div>
+        </section>
+
+        <div id="bibliotecaListaMain" class="biblioteca-list-main">
+            <p class="drawer-empty">Abra sua biblioteca para carregar os dados.</p>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <strong>Sebo Virtual</strong>
+        <span>Livros usados, anúncios, biblioteca pessoal e negociação entre leitores.</span>
+    </footer>
+</main>
+
+
+<div id="detalhesLivroOverlay" class="modal-overlay detalhes-livro-overlay" onclick="fecharDetalhesLivro()" style="display:none;">
+    <div id="detalhesLivroCard" class="details-card details-marketplace-card" onclick="event.stopPropagation()">
+        <button class="details-close drawer-close" onclick="fecharDetalhesLivro()" title="Fechar">×</button>
+        <div id="detalhesLivroConteudo">
+            <p class="drawer-empty">Carregando detalhes...</p>
+        </div>
+    </div>
+</div>
+
+
+<div id="perfilOverlay" class="drawer-overlay" onclick="fecharPerfilLateral()" style="display:none;"></div>
+<aside id="perfilDrawer" class="profile-drawer" aria-hidden="true">
+    <div class="drawer-header">
+        <div class="drawer-user-card">
+            <div id="drawerAvatar" class="drawer-avatar">U</div>
+            <div>
+                <span>Meu perfil</span>
+                <strong id="drawerUserName">Usuário</strong>
+                <small id="drawerUserCity">Cidade não informada</small>
+            </div>
+        </div>
+        <button class="drawer-close" onclick="fecharPerfilLateral()" title="Fechar">×</button>
+    </div>
+
+    <div class="drawer-actions">
+        <button class="btn-primary" onclick="abrirModalBiblioteca()">+ Adicionar leitura</button>
+        <button class="btn-ghost" onclick="window.location.href='perfil.html'">Editar perfil</button>
+    </div>
+
+    <section class="reading-focus-card">
+        <span class="drawer-eyebrow">Lendo agora</span>
+        <h3 id="drawerLivroAtualTitulo">Nenhum livro em andamento</h3>
+        <p id="drawerLivroAtualAutor">Adicione um livro à sua biblioteca para acompanhar sua evolução.</p>
+        <div class="progress-line">
+            <span id="drawerLivroAtualPaginas">0 de 0 páginas</span>
+            <strong id="drawerLivroAtualPercentual">0%</strong>
+        </div>
+        <div class="progress-track"><div id="drawerLivroAtualBarra" class="progress-fill" style="width:0%"></div></div>
+        <button id="btnRegistrarLeituraAtual" class="btn-reading" onclick="registrarLeituraLivroAtual()" disabled>Registrar leitura</button>
+    </section>
+
+    <section class="goal-card">
+        <div class="goal-title-row">
+            <div>
+                <span class="drawer-eyebrow">Metas pessoais</span>
+                <h3>Ritmo de leitura</h3>
+            </div>
+            <button class="mini-link" onclick="salvarMetasLeitura()">Salvar</button>
+        </div>
+        <div class="goal-input-grid">
+            <label>Meta diária
+                <input id="metaDiariaInput" type="number" min="1" placeholder="20">
+                <small>páginas por dia</small>
+            </label>
+            <label>Meta mensal
+                <input id="metaMensalInput" type="number" min="1" placeholder="1">
+                <small>livros por mês</small>
+            </label>
+        </div>
+        <div class="goal-progress-list">
+            <div>
+                <div class="progress-line"><span id="metaDiariaTexto">0 de 20 páginas hoje</span><strong id="metaDiariaPct">0%</strong></div>
+                <div class="progress-track"><div id="metaDiariaBarra" class="progress-fill small" style="width:0%"></div></div>
+            </div>
+            <div>
+                <div class="progress-line"><span id="metaMensalTexto">0 de 1 livro no mês</span><strong id="metaMensalPct">0%</strong></div>
+                <div class="progress-track"><div id="metaMensalBarra" class="progress-fill small" style="width:0%"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="drawer-stats-grid">
+        <div><strong id="drawerStatQueroLer">0</strong><span>quero ler</span></div>
+        <div><strong id="drawerStatLendo">0</strong><span>lendo</span></div>
+        <div><strong id="drawerStatLidos">0</strong><span>lidos</span></div>
+        <div><strong id="drawerStatPaginas">0</strong><span>páginas hoje</span></div>
+    </section>
+
+    <section class="drawer-library-section">
+        <div class="library-title-row">
+            <div>
+                <span class="drawer-eyebrow">Minha biblioteca</span>
+                <h3>Livros pessoais</h3>
+            </div>
+            <button class="mini-link" onclick="carregarPainelLeitura()">Atualizar</button>
+        </div>
+        <div id="drawerBibliotecaLista" class="drawer-library-list">
+            <p class="drawer-empty">Carregando biblioteca...</p>
+        </div>
+    </section>
+
+    <div id="drawerReadingError" class="drawer-error" style="display:none;"></div>
+</aside>
+
+<div id="bibliotecaModal" class="modal-overlay" style="display:none;">
+    <div class="library-modal">
+        <div class="modal-title-row">
+            <div>
+                <span class="drawer-eyebrow">Minha biblioteca</span>
+                <h2 id="modalBibliotecaTitulo">Novo livro</h2>
+                <p>Cadastre um livro pessoal para acompanhar páginas, status e metas de leitura.</p>
+            </div>
+            <button class="drawer-close" onclick="fecharModalBiblioteca()">×</button>
+        </div>
+
+        <div class="library-form-grid">
+            <label>Título
+                <input id="bibliotecaTitulo" type="text" placeholder="Título do livro">
+            </label>
+            <label>Autor
+                <input id="bibliotecaAutor" type="text" placeholder="Nome do autor">
+            </label>
+            <label>Total de páginas
+                <input id="bibliotecaTotalPaginas" type="number" min="1" placeholder="Total de páginas">
+            </label>
+            <label>Página atual
+                <input id="bibliotecaPaginaAtual" type="number" min="0" placeholder="Página atual">
+            </label>
+        </div>
+
+        <div class="status-picker">
+            <span>Onde colocar</span>
+            <div>
+                <button type="button" class="status-option active" data-status="quero_ler" onclick="selecionarStatusBiblioteca(this)">Quero ler</button>
+                <button type="button" class="status-option" data-status="lendo" onclick="selecionarStatusBiblioteca(this)">Lendo</button>
+                <button type="button" class="status-option" data-status="lido" onclick="selecionarStatusBiblioteca(this)">Lido</button>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-ghost" onclick="fecharModalBiblioteca()">Cancelar</button>
+            <button id="btnSalvarBiblioteca" class="btn-primary" onclick="salvarLivroBiblioteca()">Adicionar</button>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="checkoutOverlay" class="modal-overlay checkout-overlay" onclick="fecharCheckout()" style="display:none;">
+    <div class="checkout-card" onclick="event.stopPropagation()">
+        <button class="drawer-close" onclick="fecharCheckout()" title="Fechar">×</button>
+        <div class="checkout-header">
+            <span class="drawer-eyebrow">Finalizar interesse</span>
+            <h2>Resumo do pedido</h2>
+            <p>Confira os livros e envie uma solicitação organizada para o anunciante. O pagamento e entrega continuam combinados pelo chat.</p>
+        </div>
+        <div id="checkoutLista" class="checkout-list"></div>
+        <div class="checkout-form">
+            <label>Forma de entrega
+                <select id="checkoutEntrega">
+                    <option value="combinar">Combinar com o vendedor</option>
+                    <option value="retirada">Retirada presencial</option>
+                    <option value="envio">Envio a combinar</option>
+                </select>
+            </label>
+            <label>Mensagem para o vendedor
+                <textarea id="checkoutObservacao" maxlength="500" placeholder="Ex.: Olá! Tenho interesse nesse livro. Podemos combinar entrega e pagamento?"></textarea>
+            </label>
+        </div>
+        <div class="checkout-total-line">
+            <span>Total estimado</span>
+            <strong id="checkoutTotal">R$ 0,00</strong>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-ghost" onclick="fecharCheckout()">Cancelar</button>
+            <button id="btnFinalizarPedido" class="btn-primary" onclick="finalizarPedido()">Enviar pedido</button>
+        </div>
+    </div>
+</div>
+
+<div id="chatContainer" class="chat-modal chat-pro" style="display:none;">
+    <div class="chat-header">
+        <div class="chat-title-wrap">
+            <img src="logo-sebo.svg" alt="" class="chat-logo">
+            <div>
+                <strong id="chatTitulo">Negociação</strong>
+                <span id="chatStatus">Converse com o anunciante sobre preço, troca ou entrega</span>
+            </div>
+        </div>
+        <button onclick="fecharChat()" class="btn-fechar" title="Fechar">×</button>
+    </div>
+
+    <div class="chat-deal-strip">
+        <span>💬 Conversa com o anunciante</span>
+        <small>Use o chat para alinhar detalhes do livro com mais praticidade.</small>
+    </div>
+
+    <div id="chatMensagens" class="chat-messages"></div>
+
+    <div class="quick-replies">
+        <button onclick="preencherMensagemRapida('Olá! Tenho interesse neste livro. Ele ainda está disponível?')">Disponível?</button>
+        <button onclick="preencherMensagemRapida('Você aceita negociar o valor?')">Negociar valor</button>
+        <button onclick="preencherMensagemRapida('Tenho interesse em trocar por outro livro. Podemos conversar?')">Propor troca</button>
+    </div>
+
+    <div class="chat-input-area">
+        <input
+            type="text"
+            id="novaMensagem"
+            placeholder="Escreva uma mensagem para o anunciante..."
+            onkeypress="if(event.key==='Enter') enviarMensagem()"
+        >
+        <button onclick="enviarMensagem()" id="btnEnviarMensagem">Enviar</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

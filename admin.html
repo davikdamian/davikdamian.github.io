@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Sebo Virtual</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-page">
+
+<header class="site-header admin-header professional-header">
+    <a class="brand brand-pro" href="index.html" aria-label="Voltar para o Sebo Virtual">
+        <img src="logo-sebo.svg" alt="Logo Sebo Virtual" class="brand-logo-img">
+        <span class="brand-copy">
+            <strong>Admin Sebo Virtual</strong>
+            <small>gestão do catálogo e da comunidade</small>
+        </span>
+    </a>
+    <div class="header-right header-actions-pro">
+        <span class="header-pill admin-pill-top">Dashboard</span>
+        <a href="index.html" class="admin-link">Voltar ao site</a>
+        <button onclick="logoutAdmin()" class="btn-logout">Sair</button>
+    </div>
+</header>
+
+<main>
+    <section class="admin-hero">
+        <div>
+            <span class="eyebrow">Painel administrativo</span>
+            <h1>Visão geral da plataforma.</h1>
+            <p>Acompanhe anúncios, usuários, mensagens e os indicadores mais importantes do catálogo.</p>
+            <div class="admin-hero-badges">
+                <span>Moderação</span>
+                <span>Indicadores</span>
+                <span>Catálogo</span>
+            </div>
+        </div>
+        <button class="btn-primary" onclick="carregarDadosAdmin()">Atualizar dados</button>
+    </section>
+
+    <section class="stats-grid admin-stats-grid">
+        <div class="stat-card" style="--stat-color:#86efac">
+            <span class="stat-icon">📚</span>
+            <span class="stat-label">Total de livros</span>
+            <strong class="stat-value" id="totalLivros">-</strong>
+        </div>
+        <div class="stat-card" style="--stat-color:#60a5fa">
+            <span class="stat-icon">👤</span>
+            <span class="stat-label">Usuários cadastrados</span>
+            <strong class="stat-value" id="totalUsuarios">-</strong>
+        </div>
+        <div class="stat-card" style="--stat-color:#fbbf24">
+            <span class="stat-icon">💬</span>
+            <span class="stat-label">Mensagens</span>
+            <strong class="stat-value" id="totalMensagens">-</strong>
+        </div>
+        <div class="stat-card" style="--stat-color:#c084fc">
+            <span class="stat-icon">💰</span>
+            <span class="stat-label">Valor anunciado</span>
+            <strong class="stat-value smaller" id="valorAnunciado">-</strong>
+        </div>
+        <div class="stat-card" style="--stat-color:#fb7185">
+            <span class="stat-icon">🛒</span>
+            <span class="stat-label">Anúncios de venda</span>
+            <strong class="stat-value smaller" id="receitaSimulada">-</strong>
+        </div>
+        <div class="stat-card" style="--stat-color:#d6a36d">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-label">Avaliações</span>
+            <strong class="stat-value" id="totalAvaliacoes">-</strong>
+        </div>
+        <div class="stat-card" style="--stat-color:#93c5fd">
+            <span class="stat-icon">🧾</span>
+            <span class="stat-label">Pedidos</span>
+            <strong class="stat-value" id="totalPedidos">-</strong>
+        </div>
+        <div class="stat-card" style="--stat-color:#f0c674">
+            <span class="stat-icon">📈</span>
+            <span class="stat-label">Média das avaliações</span>
+            <strong class="stat-value smaller" id="mediaAvaliacoes">-</strong>
+        </div>
+    </section>
+
+    <section class="admin-insights-grid">
+        <article class="admin-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Distribuição</span>
+                    <h2>Tipos de anúncio</h2>
+                </div>
+            </div>
+            <div id="graficoTipos" class="bar-list"></div>
+        </article>
+
+        <article class="admin-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Acervo</span>
+                    <h2>Livros por gênero</h2>
+                </div>
+            </div>
+            <div id="graficoGeneros" class="bar-list"></div>
+        </article>
+
+        <article class="admin-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Engajamento</span>
+                    <h2>Usuários com mais anúncios</h2>
+                </div>
+            </div>
+            <div id="rankingUsuarios" class="ranking-list"></div>
+        </article>
+
+        <article class="admin-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Pedidos</span>
+                    <h2>Status dos pedidos</h2>
+                </div>
+            </div>
+            <div id="graficoPedidos" class="bar-list"></div>
+        </article>
+    </section>
+
+    <section class="admin-search advanced-admin-search">
+        <input type="text" id="adminBusca" placeholder="Buscar livro, autor, cidade ou usuário..." oninput="filtrarAdmin()">
+        <select id="adminFiltroTipo" onchange="filtrarAdmin()">
+            <option value="Todos">Todos os tipos</option>
+            <option value="venda">Venda</option>
+            <option value="troca">Troca</option>
+            <option value="ambos">Venda ou troca</option>
+        </select>
+        <select id="adminFiltroGenero" onchange="filtrarAdmin()">
+            <option value="Todos">Todos os gêneros</option>
+            <option value="Ficção">Ficção</option>
+            <option value="Romance">Romance</option>
+            <option value="Terror">Terror</option>
+            <option value="Técnico">Técnico</option>
+            <option value="Didático">Didático</option>
+            <option value="Acadêmico">Acadêmico</option>
+            <option value="Outros">Outros</option>
+        </select>
+        <select id="adminFiltroEstado" onchange="filtrarAdmin()">
+            <option value="Todos">Todos os estados</option>
+            <option value="novo">Novo</option>
+            <option value="seminovo">Seminovo</option>
+            <option value="usado_bom">Usado em bom estado</option>
+            <option value="usado_marcado">Usado com marcas</option>
+            <option value="danificado">Com avarias</option>
+        </select>
+        <select id="adminFiltroPedido" onchange="filtrarAdmin()">
+            <option value="Todos">Todos os pedidos</option>
+            <option value="aberto">Abertos</option>
+            <option value="em_negociacao">Em negociação</option>
+            <option value="concluido">Concluídos</option>
+            <option value="cancelado">Cancelados</option>
+        </select>
+        <button class="btn-ghost" onclick="limparBuscaAdmin()">Limpar</button>
+    </section>
+
+    <div class="admin-grid premium-admin-grid">
+        <section class="admin-section admin-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Moderação</span>
+                    <h2>📚 Gerenciar Livros</h2>
+                </div>
+                <strong id="countLivrosFiltrados">0</strong>
+            </div>
+            <div id="listaGeralLivros" class="admin-list"></div>
+        </section>
+
+        <section class="admin-section admin-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Comunidade</span>
+                    <h2>👤 Gerenciar Usuários</h2>
+                </div>
+                <strong id="countUsuariosFiltrados">0</strong>
+            </div>
+            <div id="listaGeralUsuarios" class="admin-list"></div>
+        </section>
+
+        <section class="admin-section admin-panel admin-orders-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Compras</span>
+                    <h2>🧾 Pedidos e interesses</h2>
+                </div>
+                <strong id="countPedidosFiltrados">0</strong>
+            </div>
+            <div id="listaPedidosAdmin" class="admin-list"></div>
+        </section>
+
+        <section class="admin-section admin-panel admin-reviews-panel">
+            <div class="admin-panel-title">
+                <div>
+                    <span>Comunidade</span>
+                    <h2>⭐ Avaliações e comentários</h2>
+                </div>
+                <strong id="countAvaliacoesFiltradas">0</strong>
+            </div>
+            <div id="listaAvaliacoesAdmin" class="admin-list"></div>
+        </section>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

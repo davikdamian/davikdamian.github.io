@@ -1,0 +1,64 @@
+UPGRADES GERAIS — SEBO VIRTUAL
+
+Esta versão foi feita em cima da versão estável com fotos, detalhes e avaliações.
+
+Principais melhorias adicionadas:
+
+1. Compra/pedido mais organizado
+- Ao clicar para comprar um livro com preço, abre um modal de resumo do pedido.
+- O usuário escolhe forma de entrega: combinar, retirada presencial ou envio a combinar.
+- O pedido é salvo na tabela pedidos.
+- Uma mensagem também é enviada automaticamente para o vendedor pelo chat.
+- A sacola agora usa o botão Finalizar pedido.
+
+2. Biblioteca em área própria
+- Foi adicionada a aba Biblioteca na navegação principal.
+- A biblioteca pessoal continua existindo no perfil lateral, mas agora também aparece em uma área maior e separada.
+- Dá para ver livro atual, meta diária, meta mensal, progresso e lista de livros pessoais.
+
+3. Avaliações no filtro da busca
+- Foi adicionado filtro por avaliações:
+  - 4 estrelas ou mais;
+  - 3 estrelas ou mais;
+  - somente avaliados;
+  - sem avaliações.
+
+4. Cadastro com senha mais seguro
+- Na criação de conta, agora existe campo Confirmar senha.
+- Também há botão Mostrar/Ocultar senha.
+
+5. Cidade real por IBGE
+- No perfil, o usuário escolhe Estado e Cidade.
+- As cidades são carregadas pela API pública do IBGE.
+- O valor salvo no Supabase fica no formato: Cidade - UF.
+
+6. Admin melhorado
+- Dashboard com pedidos e média de avaliações.
+- Gráfico/status dos pedidos.
+- Lista de pedidos com alteração de status.
+- Filtro por status de pedido.
+- Área de usuários agora usa Excluir dados com confirmação dupla.
+- Observação: isso apaga dados do banco, mas não apaga o usuário do Supabase Auth.
+
+7. Organização visual
+- Footer mais limpo.
+- Informações repetitivas foram reduzidas.
+- Área de biblioteca separada ajuda a não misturar livros anunciados com livros pessoais.
+
+IMPORTANTE NO SUPABASE
+
+Execute novamente o arquivo:
+
+supabase-metas-leitura.sql
+
+Ele cria/atualiza a tabela pedidos e algumas policies para o admin gerenciar dados pelo painel.
+
+Depois de executar o SQL, teste:
+- cadastro de conta com confirmar senha;
+- edição de perfil escolhendo Estado/Cidade;
+- adicionar item à sacola;
+- finalizar pedido;
+- abrir admin e ver pedidos;
+- trocar status do pedido;
+- filtro por avaliações no catálogo;
+- aba Biblioteca.

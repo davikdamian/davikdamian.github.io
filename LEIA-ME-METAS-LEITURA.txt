@@ -1,0 +1,34 @@
+MÓDULO NOVO: PERFIL LATERAL + MINHA BIBLIOTECA + METAS DE LEITURA
+
+O que foi adicionado:
+- Ao clicar no perfil do usuário no topo, abre uma aba lateral.
+- A aba lateral mostra dados do perfil, biblioteca pessoal, livro atual e metas.
+- Usuário pode definir meta diária de páginas e meta mensal de livros.
+- Usuário pode adicionar livros pessoais em: Quero ler, Lendo ou Lido.
+- Usuário pode registrar páginas lidas; a barra de progresso aumenta automaticamente.
+- O sistema soma as páginas lidas no dia e calcula o progresso da meta diária.
+- O sistema calcula quantos livros foram concluídos no mês para a meta mensal.
+
+IMPORTANTE:
+Antes de testar essa parte, execute no SQL Editor do Supabase o arquivo:
+
+supabase-metas-leitura.sql
+
+Sem esse SQL, o restante do site continua funcionando, mas o painel de leitura vai mostrar aviso de que as tabelas ainda não foram configuradas.
+
+Tabelas novas:
+- biblioteca_usuario
+- metas_leitura
+- registros_leitura
+
+Arquivos alterados:
+- index.html
+- script.js
+- style.css
+
+A lógica principal de login, anúncios, sacola, propostas e chat foi mantida.
+
+
+ATUALIZAÇÃO DE PERFIL
+- O SQL também adiciona a coluna opcional foto_url na tabela profiles.
+- Essa coluna permite salvar uma foto de perfil opcional do usuário, sem exigir Supabase Storage.

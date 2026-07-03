@@ -1,0 +1,21 @@
+MELHORIA — FOTOS E ESTADO DOS ANÚNCIOS
+
+O que foi adicionado:
+- Campo "Estado do livro" no cadastro/edição de anúncios.
+- Opção de adicionar até 4 fotos por anúncio.
+- Preview das fotos antes de salvar.
+- Remoção individual de fotos antes de salvar.
+- Cards do marketplace exibem a primeira foto como capa.
+- Indicador de quantidade de fotos quando há mais de uma.
+- Admin exibe estado do livro e quantidade de fotos.
+
+IMPORTANTE NO SUPABASE:
+Execute novamente o arquivo supabase-metas-leitura.sql no SQL Editor.
+Ele adiciona as colunas na tabela livros:
+
+alter table public.livros add column if not exists fotos jsonb not null default '[]'::jsonb;
+alter table public.livros add column if not exists estado text not null default 'usado_bom';
+
+Observação:
+As fotos estão sendo salvas em formato base64/JSON no banco para evitar configurar Supabase Storage agora.
+Para um sistema real em produção, o ideal seria usar Supabase Storage e salvar apenas as URLs das imagens no banco.
