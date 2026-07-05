@@ -75,6 +75,27 @@ function escapeHTML(valor) {
     }[char]));
 }
 
+function fotoPerfilSegura(src) {
+    return typeof src === 'string' && (
+        src.startsWith('data:image/') ||
+        src.startsWith('https://') ||
+        src.startsWith('http://')
+    );
+}
+
+function getIniciaisAdmin(nome) {
+    const partes = String(nome || 'Usuário').trim().split(/\s+/).slice(0, 2);
+    return partes.map(p => p[0]?.toUpperCase()).join('') || 'U';
+}
+
+function renderAvatarAdmin(perfil) {
+    const nome = perfil?.nome || 'Usuário';
+    if (fotoPerfilSegura(perfil?.foto_url)) {
+        return `<span class="admin-user-avatar has-photo" style="background-image:url('${escapeHTML(perfil.foto_url)}')" title="Foto de perfil de ${escapeHTML(nome)}"></span>`;
+    }
+    return `<span class="admin-user-avatar" title="Sem foto de perfil">${escapeHTML(getIniciaisAdmin(nome))}</span>`;
+}
+
 function normalizar(valor) {
     return String(valor ?? '')
         .normalize('NFD')
@@ -389,8 +410,9 @@ function renderUsuariosAdmin(perfis) {
         const mensagens = adminMensagens.filter(m => m.sender_id === p.id || m.receiver_id === p.id).length;
 
         const div = document.createElement('div');
-        div.className = 'admin-card premium-admin-card';
+        div.className = 'admin-card premium-admin-card admin-user-card';
         div.innerHTML = `
+            ${renderAvatarAdmin(p)}
             <div class="admin-card-info">
                 <div class="admin-card-title-row">
                     <h4>${escapeHTML(p.nome || 'Sem nome')}</h4>
@@ -401,6 +423,7 @@ function renderUsuariosAdmin(perfis) {
                     <span>${totalLivros} livro(s)</span>
                     <span>${formatarPreco(valorAnunciado)} anunciados</span>
                     <span>${mensagens} mensagem(ns)</span>
+                    <span>${p.foto_url ? 'Com foto' : 'Sem foto'}</span>
                 </div>
             </div>
         `;

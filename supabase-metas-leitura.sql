@@ -295,3 +295,15 @@ for all using (
   user_id = auth.uid()
   or public.is_admin()
 );
+
+
+-- Acesso público de leitura para visitantes conseguirem navegar no catálogo sem login.
+-- As ações de escrita continuam exigindo usuário autenticado pelas políticas específicas.
+drop policy if exists "livros_public_select" on public.livros;
+create policy "livros_public_select" on public.livros
+for select using (true);
+
+drop policy if exists "avaliacoes_select_auth" on public.avaliacoes_livros;
+drop policy if exists "avaliacoes_public_select" on public.avaliacoes_livros;
+create policy "avaliacoes_public_select" on public.avaliacoes_livros
+for select using (true);

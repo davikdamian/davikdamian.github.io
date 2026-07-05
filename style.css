@@ -4435,3 +4435,53 @@ body::before {
   .checkout-item b { grid-column: 2; }
   .city-select-grid { grid-template-columns: 1fr; }
 }
+
+
+/* Visitantes e fotos de usuários no admin */
+.guest-review-box p {
+  margin: 6px 0 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.admin-user-card {
+  display: grid;
+  grid-template-columns: 58px 1fr auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-user-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  font-weight: 900;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--border-md);
+  box-shadow: 0 10px 22px rgba(0,0,0,.12);
+}
+
+.admin-user-avatar.has-photo {
+  color: transparent;
+}
+
+@media (max-width: 720px) {
+  .admin-user-card {
+    grid-template-columns: 48px 1fr;
+  }
+  .admin-user-card .btn-danger {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .admin-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+  }
+}

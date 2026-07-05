@@ -22,6 +22,7 @@ let cacheAvaliacoesResumo = new Map();
 let detalhesLivroAtual = null;
 let notaSelecionadaDetalhes = 0;
 let checkoutLivros = [];
+let modoVisitante = false;
 
 const container = document.getElementById('livros');
 
@@ -175,6 +176,65 @@ function toast(msg, tipo = 'success') {
     }, 3200);
 }
 
+function usuarioEstaLogado() {
+    return Boolean(user_id);
+}
+
+function irParaLogin(mensagem = 'Para continuar, entre ou crie uma conta gratuita.') {
+    const confirmar = confirm(`${mensagem}
+
+Deseja ir para a tela de login/cadastro agora?`);
+    if (confirmar) window.location.href = 'login.html';
+}
+
+function exigirLogin(acao = 'usar esta função') {
+    if (usuarioEstaLogado()) return true;
+    toast('Entre ou crie uma conta para continuar.', 'info');
+    irParaLogin(`Você precisa ter uma conta para ${acao}.`);
+    return false;
+}
+
+function configurarHeaderVisitante() {
+    modoVisitante = true;
+    user_id = null;
+    user_nome = 'Visitante';
+    perfilUsuarioAtual = null;
+
+    const userEl = document.getElementById('user');
+    if (userEl) userEl.textContent = 'Visitante';
+    aplicarAvatarUsuario('headerAvatar', 'Visitante', null);
+
+    const perfilBtn = document.getElementById('btnPerfilUsuario');
+    if (perfilBtn) {
+        perfilBtn.title = 'Entrar ou criar conta';
+        perfilBtn.onclick = () => exigirLogin('abrir seu perfil e biblioteca');
+    }
+
+    const sairBtn = document.querySelector('.sair-btn');
+    if (sairBtn) {
+        sairBtn.textContent = 'Entrar';
+        sairBtn.onclick = () => { window.location.href = 'login.html'; };
+    }
+}
+
+function configurarHeaderLogado(perfil) {
+    modoVisitante = false;
+    const perfilBtn = document.getElementById('btnPerfilUsuario');
+    if (perfilBtn) {
+        perfilBtn.title = 'Abrir perfil';
+        perfilBtn.onclick = abrirPerfilLateral;
+    }
+
+    const sairBtn = document.querySelector('.sair-btn');
+    if (sairBtn) {
+        sairBtn.textContent = 'Sair';
+        sairBtn.onclick = logout;
+    }
+
+    document.getElementById('user').textContent = user_nome;
+    aplicarAvatarUsuario('headerAvatar', user_nome, perfil?.foto_url);
+}
+
 // ═══════════════════════════════════════
 //  SACOLA / COMPRA SIMULADA
 // ═══════════════════════════════════════
@@ -207,6 +267,7 @@ function livroNaSacola(id) {
 }
 
 window.adicionarNaSacola = function (livroId) {
+    if (!exigirLogin('adicionar livros à sacola')) return;
     const livro = cacheLivros.find(l => String(l.id) === String(livroId));
     if (!livro) {
         toast('Livro não encontrado.', 'error');
@@ -256,6 +317,7 @@ async function enviarPropostaAutomatica(livro) {
 }
 
 window.confirmarInteresse = async function (livroId) {
+    if (!exigirLogin('enviar interesse ou fazer pedido')) return;
     const livro = cacheLivros.find(l => String(l.id) === String(livroId));
     if (!livro) {
         toast('Livro não encontrado.', 'error');
@@ -289,12 +351,14 @@ window.confirmarInteresse = async function (livroId) {
 };
 
 window.enviarPropostasSacola = async function () {
+    if (!exigirLogin('finalizar pedidos da sacola')) return;
     const livrosSacola = getLivrosDaSacola();
     if (livrosSacola.length === 0) return;
     abrirCheckout(livrosSacola.map(l => l.id));
 };
 
 window.abrirCheckout = function (livroIds = null) {
+    if (!exigirLogin('finalizar um pedido')) return;
     const ids = Array.isArray(livroIds) ? livroIds.map(String) : getSacolaIds();
     checkoutLivros = cacheLivros.filter(l => ids.includes(String(l.id)) && l.dono !== user_id);
 
@@ -370,6 +434,7 @@ async function criarPedidoCompra(livro, entrega, observacao) {
 }
 
 window.finalizarPedido = async function () {
+    if (!exigirLogin('finalizar um pedido')) return;
     if (!checkoutLivros.length) return;
     const btn = document.getElementById('btnFinalizarPedido');
     const entrega = document.getElementById('checkoutEntrega')?.value || 'combinar';
@@ -413,7 +478,9 @@ function getLivrosDaSacola() {
 async function inicializar() {
     const { data: { user }, error: userError } = await _supabase.auth.getUser();
     if (userError || !user) {
-        window.location.href = 'login.html';
+        configurarHeaderVisitante();
+        atualizarBadgeSacola();
+        mudarAba('explorar', document.getElementById('btn-explorar'));
         return;
     }
 
@@ -443,8 +510,7 @@ async function inicializar() {
 
     user_nome = perfil.nome;
     perfilUsuarioAtual = perfil;
-    document.getElementById('user').textContent = user_nome;
-    aplicarAvatarUsuario('headerAvatar', user_nome, perfil.foto_url);
+    configurarHeaderLogado(perfil);
 
     if (perfil.is_admin && !document.getElementById('btn-admin')) {
         const nav = document.querySelector('nav');
@@ -462,6 +528,15 @@ async function inicializar() {
 //  NAVEGAÇÃO E FILTROS
 // ═══════════════════════════════════════
 window.mudarAba = function (aba, elemento) {
+    const abasProtegidas = ['meus', 'sacola', 'interesses', 'biblioteca'];
+    if (!usuarioEstaLogado() && abasProtegidas.includes(aba)) {
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('ativo'));
+        document.getElementById('btn-explorar')?.classList.add('ativo');
+        abaAtual = 'explorar';
+        exigirLogin(aba === 'meus' ? 'criar anúncios' : aba === 'sacola' ? 'usar a sacola' : aba === 'biblioteca' ? 'usar sua biblioteca de leitura' : 'ver suas propostas');
+        return;
+    }
+
     abaAtual = aba;
 
     document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('ativo'));
@@ -692,6 +767,7 @@ window.removerFotoAnuncio = function (index) {
 //  CADASTRAR / EDITAR LIVRO
 // ═══════════════════════════════════════
 window.adicionarLivro = async function () {
+    if (!exigirLogin('cadastrar anúncios')) return;
     const titulo = document.getElementById('titulo').value.trim();
     const autor = document.getElementById('autor').value.trim();
     const genero = document.getElementById('generoCadastro').value;
@@ -758,6 +834,7 @@ function limparFormularioLivro() {
 }
 
 function editarLivro(livro) {
+    if (!exigirLogin('editar anúncios')) return;
     livroEditandoId = livro.id;
     document.getElementById('formTitulo').textContent = 'Editar anúncio';
     document.getElementById('btnSalvarLivro').textContent = 'Salvar alterações';
@@ -1197,6 +1274,7 @@ window.abrirDetalhesLivro = async function (livroId) {
                 </div>
                 <strong id="detalhesResumoAvaliacao">${renderResumoAvaliacao(livro.id)}</strong>
             </div>
+            ${usuarioEstaLogado() ? `
             <div id="reviewFormBox" class="review-form-box">
                 <span>Sua avaliação</span>
                 <div id="reviewStars" class="review-stars">
@@ -1204,7 +1282,12 @@ window.abrirDetalhesLivro = async function (livroId) {
                 </div>
                 <textarea id="reviewComentario" maxlength="500" placeholder="Escreva um comentário curto sobre o livro ou sobre o anúncio..."></textarea>
                 <button class="btn-primary" onclick="salvarAvaliacaoLivro()">Salvar avaliação</button>
-            </div>
+            </div>` : `
+            <div id="reviewFormBox" class="review-form-box guest-review-box">
+                <span>Quer avaliar este livro?</span>
+                <p>Entre ou crie uma conta gratuita para deixar estrelas e comentários.</p>
+                <button class="btn-primary" onclick="exigirLogin('avaliar livros')">Entrar para avaliar</button>
+            </div>`}
             <div id="reviewsLista" class="reviews-list"><p class="drawer-empty">Carregando avaliações...</p></div>
         </section>
     `;
@@ -1300,6 +1383,7 @@ function renderAvaliacoesLivro(avaliacoes) {
 }
 
 window.salvarAvaliacaoLivro = async function () {
+    if (!exigirLogin('avaliar livros')) return;
     if (!detalhesLivroAtual) return;
     if (!notaSelecionadaDetalhes) {
         toast('Selecione uma nota de 1 a 5 estrelas.', 'error');
@@ -1328,6 +1412,7 @@ window.salvarAvaliacaoLivro = async function () {
 };
 
 window.excluirAvaliacaoLivro = async function (avaliacaoId) {
+    if (!exigirLogin('remover sua avaliação')) return;
     if (!confirm('Remover sua avaliação?')) return;
     try {
         const { error } = await _supabase.from('avaliacoes_livros').delete().eq('id', avaliacaoId).eq('user_id', user_id);
@@ -1432,6 +1517,7 @@ async function mostrarInteresses() {
 //  CHAT
 // ═══════════════════════════════════════
 window.abrirChat = async function (livroId, titulo, outroUsuarioId) {
+    if (!exigirLogin('conversar com o anunciante')) return;
     chatAtivoId = livroId;
     chatDestinatarioId = outroUsuarioId;
 
@@ -1491,6 +1577,7 @@ window.preencherMensagemRapida = function (texto) {
 };
 
 window.enviarMensagem = async function () {
+    if (!exigirLogin('enviar mensagens')) return;
     const input = document.getElementById('novaMensagem');
     const btn = document.getElementById('btnEnviarMensagem');
     const texto = input.value.trim();
@@ -1624,6 +1711,7 @@ function mostrarErroLeitura(error) {
 }
 
 window.abrirPerfilLateral = async function () {
+    if (!exigirLogin('abrir seu perfil e biblioteca')) return;
     const drawer = document.getElementById('perfilDrawer');
     const overlay = document.getElementById('perfilOverlay');
     if (overlay) overlay.style.display = 'block';
@@ -1670,6 +1758,7 @@ async function garantirMetaLeitura() {
 }
 
 window.carregarPainelLeitura = async function () {
+    if (!usuarioEstaLogado()) return;
     limparErroLeitura();
     const lista = document.getElementById('drawerBibliotecaLista');
     if (lista) lista.innerHTML = '<p class="drawer-empty">Carregando biblioteca...</p>';
@@ -2082,6 +2171,7 @@ window.removerLivro = async function (id, btn) {
 };
 
 window.logout = async function () {
+    if (!usuarioEstaLogado()) { window.location.href = 'login.html'; return; }
     await _supabase.auth.signOut();
     localStorage.removeItem('usuario');
     window.location.href = 'login.html';
