@@ -547,7 +547,6 @@ window.mudarAba = function (aba, elemento) {
     const hero = document.getElementById('heroPanel');
     const metricas = document.getElementById('metricasSite');
     const categorias = document.getElementById('categoriasRapidas');
-    const trustStrip = document.getElementById('trustStrip');
     const bibliotecaPage = document.getElementById('bibliotecaPage');
     const sectionHeading = document.getElementById('sectionHeading');
 
@@ -557,7 +556,6 @@ window.mudarAba = function (aba, elemento) {
     hero.style.display = (aba === 'explorar') ? 'grid' : 'none';
     metricas.style.display = (aba === 'explorar') ? 'grid' : 'none';
     categorias.style.display = (aba === 'explorar') ? 'flex' : 'none';
-    trustStrip.style.display = (aba === 'explorar' || aba === 'sacola') ? 'grid' : 'none';
     if (bibliotecaPage) bibliotecaPage.style.display = (aba === 'biblioteca') ? 'block' : 'none';
     if (sectionHeading) sectionHeading.style.display = abaCatalogo ? 'flex' : 'none';
     if (container) container.style.display = abaCatalogo ? 'grid' : 'none';
@@ -624,6 +622,17 @@ window.limparFiltros = function () {
     termoBusca = '';
     sincronizarChips();
     mostrarLivros();
+};
+
+// Mostra/esconde os filtros avançados (ordenação e avaliações) para deixar a
+// barra de filtros principal mais enxuta: busca, tipo e gênero (via chips) ficam sempre visíveis.
+window.toggleFiltrosAvancados = function () {
+    const painel = document.getElementById('filtrosAvancados');
+    const botao = document.getElementById('btnMaisFiltros');
+    if (!painel) return;
+    const aberto = painel.style.display === 'flex';
+    painel.style.display = aberto ? 'none' : 'flex';
+    if (botao) botao.textContent = aberto ? 'Mais filtros ▾' : 'Mais filtros ▴';
 };
 
 window.filtrarGeneroRapido = function (genero) {
@@ -1036,8 +1045,10 @@ function renderCard(l) {
         </div>
         <h3 class="livro-titulo">${escapeHTML(l.titulo)}</h3>
         <p class="livro-autor">por ${escapeHTML(l.autor)}</p>
-        ${renderContadorFotos(l)}
-        ${renderResumoAvaliacao(l.id)}
+        <div class="card-meta-row">
+            ${renderResumoAvaliacao(l.id)}
+            ${renderContadorFotos(l)}
+        </div>
         ${perfilDono && abaAtual === 'explorar' ? `<p class="livro-dono">👤 ${escapeHTML(perfilDono.nome || 'Leitor')} ${perfilDono.cidade ? '• ' + escapeHTML(perfilDono.cidade) : ''}</p>` : ''}
         ${precoHTML}
         <div class="livro-acoes"></div>
@@ -1723,8 +1734,8 @@ window.abrirPerfilLateral = async function () {
     setText('drawerUserName', user_nome || 'Usuário');
     setText('drawerUserCity', perfilUsuarioAtual?.cidade ? perfilUsuarioAtual.cidade : 'Cidade não informada');
     aplicarAvatarUsuario('drawerAvatar', user_nome, perfilUsuarioAtual?.foto_url);
-
-    await carregarPainelLeitura();
+    // As metas, progresso e lista de livros pessoais agora vivem só na aba Biblioteca,
+    // então não recarregamos esses dados aqui — eles são buscados quando o usuário abre essa aba.
 };
 
 window.fecharPerfilLateral = function () {

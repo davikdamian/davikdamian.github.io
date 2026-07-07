@@ -184,6 +184,25 @@ main {
   flex-wrap: wrap;
 }
 
+.filtros-avancados {
+  display: none;
+  width: 100%;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.filtros-avancados select {
+  flex: 1;
+  min-width: 180px;
+}
+
+#btnMaisFiltros {
+  white-space: nowrap;
+}
+
 .busca {
   flex: 1;
   min-width: 200px;
@@ -3473,6 +3492,16 @@ body::before {
 }
 .drawer-actions button { min-height: 46px; }
 
+.drawer-shortcuts-hint {
+  color: var(--muted, rgba(248,241,232,.66));
+  font-size: .86rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,244,230,.09);
+  border-radius: 16px;
+  background: rgba(255,248,240,.03);
+}
+
 .reading-focus-card,
 .goal-card,
 .drawer-library-section,
@@ -4018,6 +4047,19 @@ body::before {
   color: #f2c99a;
   font-size: .72rem;
   font-weight: 800;
+}
+
+.card-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 2px;
+}
+
+.card-meta-row .rating-summary,
+.card-meta-row .photo-count {
+  margin: 0;
 }
 
 .photo-count,

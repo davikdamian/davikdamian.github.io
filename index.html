@@ -29,7 +29,7 @@
 <nav class="app-nav">
     <button id="btn-explorar" onclick="mudarAba('explorar', this)" class="ativo">Explorar</button>
     <button id="btn-sacola" onclick="mudarAba('sacola', this)">Sacola <span id="badgeSacola" class="nav-badge">0</span></button>
-    <button id="btn-interesses" onclick="mudarAba('interesses', this)">Propostas</button>
+    <button id="btn-interesses" onclick="mudarAba('interesses', this)">Propostas recebidas</button>
     <button id="btn-biblioteca" onclick="mudarAba('biblioteca', this)">Biblioteca</button>
     <button id="btn-meus" onclick="mudarAba('meus', this)">Meus Anúncios</button>
 </nav>
@@ -94,7 +94,18 @@
             oninput="buscarLivros()"
             class="busca"
         />
-        <select id="filtroGenero" onchange="sincronizarChips(); mostrarLivros();">
+        <select id="filtroTipo" onchange="mostrarLivros()">
+            <option value="Todos">Todos os anúncios</option>
+            <option value="venda">Venda</option>
+            <option value="troca">Troca</option>
+            <option value="ambos">Venda ou troca</option>
+        </select>
+        <button type="button" id="btnMaisFiltros" class="btn-ghost" onclick="toggleFiltrosAvancados()">Mais filtros ▾</button>
+        <button class="btn-ghost" onclick="limparFiltros()">Limpar</button>
+
+        <!-- O gênero já é escolhido pelos chips acima; este select fica oculto e serve só de "memória"
+             do gênero atual para o restante do código, evitando dois controles fazendo a mesma coisa. -->
+        <select id="filtroGenero" onchange="sincronizarChips(); mostrarLivros();" style="display:none;" aria-hidden="true" tabindex="-1">
             <option value="Todos">Todos os gêneros</option>
             <option value="Ficção">Ficção</option>
             <option value="Romance">Romance</option>
@@ -104,27 +115,23 @@
             <option value="Acadêmico">Acadêmico</option>
             <option value="Outros">Outros</option>
         </select>
-        <select id="filtroTipo" onchange="mostrarLivros()">
-            <option value="Todos">Todos os anúncios</option>
-            <option value="venda">Venda</option>
-            <option value="troca">Troca</option>
-            <option value="ambos">Venda ou troca</option>
-        </select>
-        <select id="filtroOrdenacao" onchange="mostrarLivros()">
-            <option value="recentes">Mais recentes</option>
-            <option value="titulo">Título A-Z</option>
-            <option value="autor">Autor A-Z</option>
-            <option value="menor-preco">Menor preço</option>
-            <option value="maior-preco">Maior preço</option>
-        </select>
-        <select id="filtroAvaliacao" onchange="mostrarLivros()">
-            <option value="Todos">Todas as avaliações</option>
-            <option value="4">4 estrelas ou mais</option>
-            <option value="3">3 estrelas ou mais</option>
-            <option value="avaliados">Somente avaliados</option>
-            <option value="sem">Sem avaliações</option>
-        </select>
-        <button class="btn-ghost" onclick="limparFiltros()">Limpar</button>
+
+        <div id="filtrosAvancados" class="filtros-avancados" style="display:none;">
+            <select id="filtroOrdenacao" onchange="mostrarLivros()">
+                <option value="recentes">Mais recentes</option>
+                <option value="titulo">Título A-Z</option>
+                <option value="autor">Autor A-Z</option>
+                <option value="menor-preco">Menor preço</option>
+                <option value="maior-preco">Maior preço</option>
+            </select>
+            <select id="filtroAvaliacao" onchange="mostrarLivros()">
+                <option value="Todos">Todas as avaliações</option>
+                <option value="4">4 estrelas ou mais</option>
+                <option value="3">3 estrelas ou mais</option>
+                <option value="avaliados">Somente avaliados</option>
+                <option value="sem">Sem avaliações</option>
+            </select>
+        </div>
     </section>
 
     <section id="formSection" class="form-section" style="display:none;">
@@ -212,12 +219,6 @@
 
     <section id="livros" class="grid"></section>
 
-    <section id="trustStrip" class="trust-strip compact-info-strip">
-        <div><strong>Negociação direta</strong><span>Compra, troca e conversa com o anunciante.</span></div>
-        <div><strong>Biblioteca pessoal</strong><span>Metas de leitura e progresso do usuário.</span></div>
-        <div><strong>Administração</strong><span>Gestão de anúncios, avaliações e pedidos.</span></div>
-    </section>
-
     <section id="bibliotecaPage" class="biblioteca-page" style="display:none;">
         <div class="biblioteca-hero">
             <div>
@@ -301,73 +302,13 @@
     </div>
 
     <div class="drawer-actions">
-        <button class="btn-primary" onclick="abrirModalBiblioteca()">+ Adicionar leitura</button>
+        <button class="btn-primary" onclick="fecharPerfilLateral(); mudarAba('biblioteca', document.getElementById('btn-biblioteca'))">📚 Ver minha biblioteca</button>
         <button class="btn-ghost" onclick="window.location.href='perfil.html'">Editar perfil</button>
     </div>
 
-    <section class="reading-focus-card">
-        <span class="drawer-eyebrow">Lendo agora</span>
-        <h3 id="drawerLivroAtualTitulo">Nenhum livro em andamento</h3>
-        <p id="drawerLivroAtualAutor">Adicione um livro à sua biblioteca para acompanhar sua evolução.</p>
-        <div class="progress-line">
-            <span id="drawerLivroAtualPaginas">0 de 0 páginas</span>
-            <strong id="drawerLivroAtualPercentual">0%</strong>
-        </div>
-        <div class="progress-track"><div id="drawerLivroAtualBarra" class="progress-fill" style="width:0%"></div></div>
-        <button id="btnRegistrarLeituraAtual" class="btn-reading" onclick="registrarLeituraLivroAtual()" disabled>Registrar leitura</button>
+    <section class="drawer-shortcuts">
+        <p class="drawer-shortcuts-hint">Suas metas de leitura, progresso e lista de livros pessoais agora ficam reunidos na aba <strong>Biblioteca</strong>, para não misturar com os seus anúncios.</p>
     </section>
-
-    <section class="goal-card">
-        <div class="goal-title-row">
-            <div>
-                <span class="drawer-eyebrow">Metas pessoais</span>
-                <h3>Ritmo de leitura</h3>
-            </div>
-            <button class="mini-link" onclick="salvarMetasLeitura()">Salvar</button>
-        </div>
-        <div class="goal-input-grid">
-            <label>Meta diária
-                <input id="metaDiariaInput" type="number" min="1" placeholder="20">
-                <small>páginas por dia</small>
-            </label>
-            <label>Meta mensal
-                <input id="metaMensalInput" type="number" min="1" placeholder="1">
-                <small>livros por mês</small>
-            </label>
-        </div>
-        <div class="goal-progress-list">
-            <div>
-                <div class="progress-line"><span id="metaDiariaTexto">0 de 20 páginas hoje</span><strong id="metaDiariaPct">0%</strong></div>
-                <div class="progress-track"><div id="metaDiariaBarra" class="progress-fill small" style="width:0%"></div></div>
-            </div>
-            <div>
-                <div class="progress-line"><span id="metaMensalTexto">0 de 1 livro no mês</span><strong id="metaMensalPct">0%</strong></div>
-                <div class="progress-track"><div id="metaMensalBarra" class="progress-fill small" style="width:0%"></div></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="drawer-stats-grid">
-        <div><strong id="drawerStatQueroLer">0</strong><span>quero ler</span></div>
-        <div><strong id="drawerStatLendo">0</strong><span>lendo</span></div>
-        <div><strong id="drawerStatLidos">0</strong><span>lidos</span></div>
-        <div><strong id="drawerStatPaginas">0</strong><span>páginas hoje</span></div>
-    </section>
-
-    <section class="drawer-library-section">
-        <div class="library-title-row">
-            <div>
-                <span class="drawer-eyebrow">Minha biblioteca</span>
-                <h3>Livros pessoais</h3>
-            </div>
-            <button class="mini-link" onclick="carregarPainelLeitura()">Atualizar</button>
-        </div>
-        <div id="drawerBibliotecaLista" class="drawer-library-list">
-            <p class="drawer-empty">Carregando biblioteca...</p>
-        </div>
-    </section>
-
-    <div id="drawerReadingError" class="drawer-error" style="display:none;"></div>
 </aside>
 
 <div id="bibliotecaModal" class="modal-overlay" style="display:none;">
