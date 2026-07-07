@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil – Sebo Virtual</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="setup-page">
+
+    <div class="setup-container">
+        <div class="perfil-avatar" id="avatarEl">📚</div>
+
+        <div class="setup-card">
+            <h2>Complete seu Perfil</h2>
+            <p class="subtitle">Suas informações de contato serão exibidas para outros usuários quando se interessarem pelos seus livros.</p>
+
+
+            <div class="input-group photo-profile-box">
+                <label>Foto de perfil <span class="optional-label">opcional</span></label>
+                <div class="photo-upload-row">
+                    <button type="button" class="photo-preview" onclick="document.getElementById('p-foto').click()" title="Escolher foto de perfil">
+                        <img id="fotoPreview" alt="Prévia da foto de perfil" style="display:none;">
+                        <span id="fotoPreviewText">📚</span>
+                    </button>
+                    <div class="photo-upload-actions">
+                        <input type="file" id="p-foto" accept="image/*" onchange="previewFotoPerfil(event)" style="display:none;">
+                        <button type="button" class="btn-photo" onclick="document.getElementById('p-foto').click()">Escolher foto</button>
+                        <button type="button" class="btn-photo ghost" onclick="removerFotoPerfil()">Remover</button>
+                        <small>Você pode deixar sem foto. A imagem será usada apenas no seu perfil.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="p-nome">Nome Completo</label>
+                <input type="text" id="p-nome" placeholder="Como você quer ser chamado?">
+            </div>
+
+            <div class="input-group">
+                <label for="p-whatsapp">WhatsApp</label>
+                <input type="tel" id="p-whatsapp" placeholder="(48) 99999-9999">
+            </div>
+
+            <div class="input-group city-group">
+                <label for="p-uf">Estado e cidade</label>
+                <div class="city-select-grid">
+                    <select id="p-uf" onchange="carregarCidadesIBGE(this.value)">
+                        <option value="">Carregando estados...</option>
+                    </select>
+                    <select id="p-cidade" disabled>
+                        <option value="">Selecione o estado primeiro</option>
+                    </select>
+                </div>
+                <small class="input-hint">As cidades são carregadas a partir da base pública do IBGE.</small>
+            </div>
+
+            <div id="perfil-error" style="display:none; color:var(--danger); font-size:0.85rem; margin-bottom:10px; padding:10px; background:var(--danger-bg); border-radius:8px;"></div>
+
+            <button class="btn-salvar" id="btn-salvar" onclick="salvarPerfil()">
+                <span id="btn-txt">Salvar e Começar</span>
+                <span id="btn-load" style="display:none">Salvando...</span>
+            </button>
+
+            <a href="index.html" class="back-link" id="back-link" style="display:none">← Voltar para o início</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="perfil.js"></script>
+</body>
+</html>
